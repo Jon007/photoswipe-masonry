@@ -97,11 +97,12 @@ var photoswipe_masonry = function($){
     }
 
     var items = getItems();
+    /*
     $.each(items, function(index, value) {
       image[index]     = new Image();
       image[index].src = value['src'];
     });
-
+*/
     $psgal.on('click', 'a[data-psindex]', function(event) {
 
       event.preventDefault();
