@@ -26,6 +26,7 @@ var photoswipe_masonry = function($){
         var $img = $(this).find('img').first();
         if ($img.length){
           var $href   = $(this).attr('href');
+  		if (! $href){return;}
           var $ext = $href.split('.').pop();
           switch($ext) {
           case "jpg":
@@ -97,12 +98,7 @@ var photoswipe_masonry = function($){
     }
 
     var items = getItems();
-    /*
-    $.each(items, function(index, value) {
-      image[index]     = new Image();
-      image[index].src = value['src'];
-    });
-*/
+
     $psgal.on('click', 'a[data-psindex]', function(event) {
 
       event.preventDefault();

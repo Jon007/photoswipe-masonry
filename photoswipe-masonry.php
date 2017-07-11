@@ -390,6 +390,7 @@ function photoswipe_shortcode( $attr ) {
 
 	global $post;
 	global $photoswipe_count;
+    if ( (wp_doing_ajax()) || (! $post) ){return '';}
 
 	$options = get_option('photoswipe_options');
 
