@@ -403,7 +403,7 @@ function photoswipe_shortcode( $attr ) {
 	}
 
 	$args = shortcode_atts(array(
-		'id' 				=> intval($post->ID),
+		'id' 		 => $post ? $post->ID : 0,
 		'show_controls' 	=> $options['show_controls'],
 		'columns'    => 3,
 		'size'       => 'thumbnail',
@@ -411,7 +411,7 @@ function photoswipe_shortcode( $attr ) {
 		'orderby'    => 'menu_order ID',
 		'include'    => '',
 		'exclude'    => ''
-	), $attr);
+	), $attr, 'gallery' );  //allow filter shortcode_atts_gallery as used by Enhanced Media Library etc
 
 	$photoswipe_count += 1;
 	$post_id = intval($post->ID) . '_' . $photoswipe_count;
@@ -527,8 +527,17 @@ function photoswipe_shortcode( $attr ) {
 		</style>";
 
 		$output_buffer .=' <div style="clear:both"></div>
+<div id="psgal_'.$post_id.'" class="psgal gallery-columns-'.$columns.' gallery-size-'.$size_class.'" itemscope itemtype="http://schema.org/ImageGallery" >';
 
-		<div id="psgal_'.$post_id.'" class="psgal gallery-columns-'.$columns.' gallery-size-'.$size_class.'" itemscope itemtype="http://schema.org/ImageGallery" >';
+        /**
+         * Allow same filter as built-in media gallery
+         *
+         * @since 2.5.0
+         *
+         * @param string $gallery_style Default CSS styles and opening HTML div container
+         *                              for the gallery shortcode output.
+         */
+        $output_buffer = apply_filters( 'gallery_style', $output_buffer );
 
 
 		if ( !empty($attachments) ) {
@@ -548,7 +557,7 @@ function photoswipe_shortcode( $attr ) {
 				$output_buffer .='
 				<figure class="msnry_item" itemscope itemtype="http://schema.org/ImageObject">
 					<a href="'. $full[0] .'" itemprop="contentUrl" data-size="'.$full[1].'x'.$full[2].'" data-caption="'. $image_caption .'" >
-				        <img src='. $thumb[0] .' itemprop="thumbnail" alt="'.$image_alttext.'"  />
+				        <img src="'. $thumb[0] .'" itemprop="thumbnail" alt="'.$image_alttext.'"  />
 				    </a>
 				    <figcaption class="photoswipe-gallery-caption" >'. $image_caption .'</figcaption>
 			    </figure>
