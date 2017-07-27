@@ -289,26 +289,27 @@ function photoswipe_scripts_method() {
 
 	$options = get_option('photoswipe_options');
 	$photoswipe_wp_plugin_path =  plugins_url() . '/photoswipe-masonry' ;
+    $suffix = defined( 'SCRIPT_DEBUG' ) && SCRIPT_DEBUG ? '' : '.min';
 
-	wp_enqueue_style( 'photoswipe-core-css',	$photoswipe_wp_plugin_path . '/photoswipe-dist/photoswipe.css');
+	wp_enqueue_style( 'photoswipe-core-css',	$photoswipe_wp_plugin_path . '/photoswipe-dist/photoswipe' . $suffix . '.css');
 
 
 	// Skin CSS file (optional)
     // In folder of skin CSS file there are also:
     // - .png and .svg icons sprite,
     // - preloader.gif (for browsers that do not support CSS animations)
-    if($options['white_theme']) wp_enqueue_style( 'white_theme', $photoswipe_wp_plugin_path . '/photoswipe-dist/white-skin/skin.css'  );
-    else wp_enqueue_style( 'pswp-skin', $photoswipe_wp_plugin_path . '/photoswipe-dist/default-skin/default-skin.css'  );
+    if($options['white_theme']) wp_enqueue_style( 'white_theme', $photoswipe_wp_plugin_path . '/photoswipe-dist/white-skin/skin' . $suffix . '.css'  );
+    else wp_enqueue_style( 'pswp-skin', $photoswipe_wp_plugin_path . '/photoswipe-dist/default-skin/default-skin' . $suffix . '.css'  );
 
 	wp_enqueue_script('jquery');
 
 	//Core JS file
-	wp_enqueue_script( 'photoswipe', 			$photoswipe_wp_plugin_path . '/photoswipe-dist/photoswipe.min.js');
+	wp_enqueue_script( 'photoswipe', 			$photoswipe_wp_plugin_path . '/photoswipe-dist/photoswipe' . $suffix . '.js');
 
-	wp_enqueue_script( 'photoswipe-masonry-js', $photoswipe_wp_plugin_path . '/photoswipe-masonry.min.js');
+	wp_enqueue_script( 'photoswipe-masonry-js', $photoswipe_wp_plugin_path . '/photoswipe-masonry' . $suffix . '.js');
 
 	//UI JS file
-	wp_enqueue_script( 'photoswipe-ui-default', $photoswipe_wp_plugin_path . '/photoswipe-dist/photoswipe-ui-default.min.js', array(), null);  //cache bust
+	wp_enqueue_script( 'photoswipe-ui-default', $photoswipe_wp_plugin_path . '/photoswipe-dist/photoswipe-ui-default' . $suffix . '.js', array(), null);  //cache bust
 
 	//Masonry - re-named to move to header
 	wp_enqueue_script( 'photoswipe-masonry', 	$photoswipe_wp_plugin_path . '/masonry.pkgd.min.js','','',false);
@@ -401,7 +402,7 @@ function photoswipe_shortcode( $attr ) {
 		}
 		$attr['include'] = $attr['ids'];
 	}
-
+    
 	$args = shortcode_atts(array(
 		'id' 		 => $post ? $post->ID : 0,
 		'show_controls' 	=> $options['show_controls'],
@@ -449,86 +450,49 @@ function photoswipe_shortcode( $attr ) {
         $itemwidth = $columns > 0 ? floor(100/$columns) : 100;
 
 
-		$output_buffer .= "
-
-		<style type='text/css'>
-
-			/* PhotoSwipe Plugin */
-			.psgal {
-				margin: auto;
-				padding-bottom:40px;
-
-				-webkit-transition: all 0.4s ease;
-				-moz-transition: all 0.4s ease;
-				-o-transition: all 0.4s ease;
-				transition: all 0.4s ease;
-
-				";
+		$output_buffer .= "<style type='text/css'>
+.psgal {
+margin: auto;
+padding-bottom:40px;
+-webkit-transition: all 0.4s ease;
+-moz-transition: all 0.4s ease;
+-o-transition: all 0.4s ease;
+transition: all 0.4s ease;
+";
 
 				if($options['use_masonry']) $output_buffer .="opacity:1; text-align:center;";
 
-				$output_buffer .= "
-
-			}
-
-			.psgal.photoswipe_showme{
-				opacity:1;
-			}
-
-			.psgal figure {
-				float: left;
-
-				";
+				$output_buffer .= "}
+.psgal.photoswipe_showme{opacity:1;}
+.psgal figure {float: left;";
 
 				if($options['use_masonry']) $output_buffer .="float:none; display:inline-block;;";
 
-				$output_buffer .= "
-
-				text-align: center;
-        width:".$img_width."px;        
-				padding:5px;
-				margin: 0px;
-				box-sizing:border-box;
-			}
+				$output_buffer .= "text-align: center;
+width:".$img_width."px;        
+padding:5px;
+margin: 0px;
+box-sizing:border-box;
+}
       
-      /*this is causing negative effect on other <a> tags which end up being contained in the scenario of using psgal for the whole content..
-			.psgal a{
-				display:block;
-			}
-      */
-			.psgal figure img {
-				margin:auto;
-				max-width:100%;
-        width:".$img_width."px;        
-				height: auto;
-				border: 0;
-			}
-			.psgal figure figcaption{
-				font-size:13px;
-			}
+.psgal figure img {
+margin:auto;
+max-width:100%;
+width:".$img_width."px;        
+height: auto;
+border: 0;
+}
+.psgal figure figcaption{font-size:13px;}
+.msnry{margin:auto;}
+.pswp__caption__center{text-align: center;}";
 
-			.msnry{
-				margin:auto;
-			}
-			.pswp__caption__center{
-				text-align: center;
-			}
-			";
+			if(!$options['show_captions']) $output_buffer .=".photoswipe-gallery-caption{display:none;}";
 
-			if(!$options['show_captions']) $output_buffer .="
+			$output_buffer .= "</style>";
 
-			.photoswipe-gallery-caption{
-				display:none;
-			}
-
-			";
-
-			$output_buffer .= "
-		</style>";
-
-		$output_buffer .=' <div style="clear:both"></div>
+		$output_buffer .='<div style="clear:both"></div>
 <div id="psgal_'.$post_id.'" class="psgal gallery-columns-'.$columns.' gallery-size-'.$size_class.'" itemscope itemtype="http://schema.org/ImageGallery" >';
-
+        
         /**
          * Allow same filter as built-in media gallery
          *
