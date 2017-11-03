@@ -27,7 +27,7 @@ var photoswipe_masonry = function($){
         if ($img.length){
           var $href   = $(this).attr('href');
   		if (! $href){return;}
-          var $ext = $href.split('.').pop();
+          var $ext = $href.split('.').pop().toLowerCase();
           switch($ext) {
           case "jpg":
           case "png":
