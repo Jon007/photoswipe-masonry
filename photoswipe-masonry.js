@@ -61,10 +61,14 @@ var photoswipe_masonry = function($){
             //$img = $(this).find('img');
             $title = $(this).attr('data-caption');
             if (!($title)) {
-              $figcaption = $(this).find('figcaption');
-              $title = $figcaption.val();
+							try{
+								$figcaption = $(this).parent().find('figcaption');
+								if ($figcaption[0]){
+									$title = $figcaption[0].textContent;
+								}
+							} catch(e){}
               if (!($title)) {
-                $title= $img.attr('title');
+                $title= $img.attr('title');  //actually wp currently doesn't output title :(
                 if (!($title)) {
                   $title= $img.attr('alt');
                   if (!($title)) {
