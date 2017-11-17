@@ -62,9 +62,13 @@ var photoswipe_masonry = function($){
             $title = $(this).attr('data-caption');
             if (!($title)) {
 							try{
-								$figcaption = $(this).parent().find('figcaption');
-								if ($figcaption[0]){
-									$title = $figcaption[0].textContent;
+								$figure = $(this).parent();
+								$parentTag = $figure[0].tagName;
+								if ($parentTag == 'FIGURE'){
+                  $figcaption = $(this).parent().find('figcaption');
+                  if ($figcaption[0]){
+                    $title = $figcaption[0].textContent;
+                  }
 								}
 							} catch(e){}
               if (!($title)) {
