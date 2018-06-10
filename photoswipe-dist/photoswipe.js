@@ -2783,6 +2783,13 @@ var _getItemAt,
 				if(!item.bounds) {
 					// reuse bounds object
 					item.bounds = _getZeroBounds(); 
+					/*
+					 * JM: fix to initialization bug where
+					 * img did not have height and width attributes
+					 */
+					if (! item.initialPosition ){
+					    item.initialPosition = item.bounds.center;
+					}
 				}
 			}
 
