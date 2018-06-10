@@ -48,9 +48,23 @@ var photoswipe_masonry = function($) {
                     } else {
                         //if no saved size, use the ratio of the small image as basis for calculation..
                         //..works great for images within an article
-                        $width = myImg.naturalWidth;
-                        $height = myImg.naturalHeight;
+                        var $imgWidth = $img.attr('width');
+                        var $imgHeight = $img.attr('height');
+                        try {
+                          $height=$width*$imgHeight/$imgWidth;
+                        }
+                        catch(e){}                        
+                        //TODO: naturalWidth is not available until the image is loaded, 
+                        //but photoswipe can't wait for all the images to load before initializing
+                        //so significant rewrite would be needed to make it more adaptable..
+                        /*
+                        $img.onload = function($width, $height)
+                        {
+                          $width = $img.naturalWidth;
+                          $height = $img.naturalHeight;
                         $(this).attr('data-size', $width + 'x' + $height);
+                    }
+                        */
                     }
 
                     //ADDED: set item photoswipe index to avoid recalculating it later
@@ -104,6 +118,56 @@ var photoswipe_masonry = function($) {
         //extra check for bbpress body images without an anchor and auto-wrap them
         if ($psgal && $psgal[0].classList.contains('bbpress')) {
             var $bbpBody = $('.bbp-body').first();
+            $bbpBody.find('img').each(function() {
+                var $img = $(this);
+                var $imgParent = $img.parent();
+                if ($imgParent[0].tagName.toUpperCase() != 'A' && !($img[0].classList.contains('avatar'))) {
+                    //get the image properties
+                    $href = $img.attr('src');
+                    //default src width and height: TODO: alternative way of getting real dimensions if size missing
+                    var $width = 1800;
+                    var $height = 1800;
+                    var $imgWidth = $img.attr('width');
+                    var $imgHeight = $img.attr('height');
+                    try {
+                        $height = $width * $imgHeight / $imgWidth;
+                    } catch (e) {}
+                    var $title = $img.attr('title');
+                    if (!($title)) {
+                        $title = $img.attr('alt');
+                        if (!($title)) {
+                            $title = $href.substring($href.lastIndexOf('/') + 1);
+                        }
+                    }
+                    ;
+                    //create anchor child 
+                    var $wrapper = document.createElement('a');
+                    $wrapper.setAttribute('href', $href);
+                    //ADDED: set item photoswipe index to avoid recalculating it later
+                    $wrapper.setAttribute('data-psindex', items.length);
+
+                    // set the wrapper as child (instead of the element)
+                    $imgParent[0].replaceChild($wrapper, $img[0]);
+                    // set element as child of wrapper
+                    $wrapper.appendChild($img[0]);
+
+                    var item = {
+                        src: $href,
+                        w: $width,
+                        h: $height,
+                        el: $($wrapper),
+                        msrc: $href,
+                        title: $title
+                    }
+                    items.push(item);
+
+                }
+            });
+        }
+
+        //extra check for event calendar images without an anchor and auto-wrap them too
+        if ($psgal && $psgal[0].classList.contains('single-ai1ec_event')) {
+            var $bbpBody = $('.entry-content').first();
             $bbpBody.find('img').each(function() {
                 var $img = $(this);
                 var $imgParent = $img.parent();
